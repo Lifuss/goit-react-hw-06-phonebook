@@ -1,16 +1,32 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import {
   StyledBtn,
   StyledForm,
   StyledInput,
   StyledLabel,
 } from './ContactForm.styled';
+import { useDispatch, useSelector } from 'react-redux';
+import { setContacts } from 'redux/phoneBook/slice';
+import { selectContacts } from 'redux/phoneBook/selectors';
 
-const ContactForm = ({ onSubmit }) => {
+const ContactForm = () => {
+  const dispatch = useDispatch();
+  const contacts = useSelector(selectContacts);
+
   const handleSubmit = e => {
     e.preventDefault();
-    onSubmit(e.target.elements.name.value, e.target.elements.number.value);
+    const { name, number } = e.target.elements;
+    if (contacts.find(user => user.name === name.value)) {
+      alert(`${name.value} is already in contacts`);
+      return;
+    }
+    dispatch(
+      setContacts({
+        name: name.value,
+        number: number.value,
+        id: crypto.randomUUID(),
+      })
+    );
     e.target.reset();
   };
 
@@ -41,10 +57,6 @@ const ContactForm = ({ onSubmit }) => {
       <StyledBtn>Add contacts</StyledBtn>
     </StyledForm>
   );
-};
-
-ContactForm.propTypes = {
-  onSubmit: PropTypes.func,
 };
 
 export default ContactForm;
